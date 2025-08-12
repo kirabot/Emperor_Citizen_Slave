@@ -1,0 +1,29 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>e-card (guest)</title>
+    <style>
+      body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif; margin:0; background:#0b0d10; color:#e6e6e6; }
+      .app { max-width: 920px; margin: 0 auto; padding: 24px; }
+      .card { background:#141820; border:1px solid #232838; border-radius:16px; padding:16px; box-shadow: 0 4px 24px rgba(0,0,0,.2); }
+      .row { display:flex; gap:12px; align-items:center; flex-wrap:wrap; }
+      input, button { padding:10px 12px; border-radius:10px; border:1px solid #2a3145; background:#0f1320; color:#e6e6e6; }
+      button { cursor:pointer; }
+      button:disabled { opacity: .5; cursor:not-allowed; }
+      .hand { display:flex; gap:12px; margin-top: 12px; }
+      .pill { padding:6px 10px; border-radius:999px; border:1px solid #2a3145; background:#0f1320; font-size:12px; }
+      .sep { height:1px; background:#22283a; margin: 12px 0; }
+      .muted { opacity:.8 }
+      .grid { display:grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap:10px; }
+      .big { font-size:18px; font-weight:600; }
+      .winner { color:#7bf59b; }
+      .danger { color:#f57b7b; }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

@@ -23,11 +23,26 @@
       .lock-hint { font-weight:600; letter-spacing:0.2px; }
       .lock-alert { color:#f0c674; }
       .history-list { margin-top:10px; display:flex; flex-direction:column; gap:10px; }
-      .history-item { padding:10px 12px; border-radius:12px; border:1px solid rgba(255,255,255,.08); background:#10141f; box-shadow:0 4px 12px rgba(0,0,0,.25); }
-      .history-item.history-latest { border-color:#7bf59b; box-shadow:0 6px 18px rgba(123,245,155,.25); }
-      .history-round { font-size:12px; opacity:.75; margin-bottom:4px; }
+      .history-empty { opacity:.65; font-style:italic; padding:8px 0; }
+      .history-round-segment { padding:12px; border-radius:12px; border:1px solid rgba(255,255,255,.08); background:#10141f; box-shadow:0 4px 12px rgba(0,0,0,.25); display:flex; flex-direction:column; gap:12px; }
+      .history-round-segment.history-latest { border-color:#7bf59b; box-shadow:0 6px 18px rgba(123,245,155,.25); }
+      .history-round-header { display:flex; align-items:center; gap:10px; font-size:12px; letter-spacing:0.3px; text-transform:uppercase; opacity:.85; }
+      .history-round-line { height:1px; background:rgba(255,255,255,.08); flex:1; }
+      .history-round-label { font-weight:800; color:#cdd5f5; white-space:nowrap; }
+      .history-hands-row { display:flex; gap:14px; flex-wrap:wrap; align-items:flex-start; }
+      .history-hand { display:flex; flex-direction:column; gap:6px; padding:10px; border-radius:10px; background:rgba(0,0,0,.16); min-width:240px; }
+      .history-hand-cards { display:flex; align-items:center; gap:10px; }
+      .history-versus { font-weight:800; text-transform:uppercase; opacity:.75; font-size:12px; letter-spacing:0.4px; }
       .history-flavor { font-weight:600; line-height:1.4; }
-      .history-result { font-size:12px; margin-top:6px; text-transform:uppercase; letter-spacing:0.3px; font-weight:700; }
+      .history-result { font-size:12px; text-transform:uppercase; letter-spacing:0.3px; font-weight:700; opacity:.9; }
+      .history-card { display:flex; align-items:center; gap:8px; padding:6px 8px; border-radius:10px; border:1px solid rgba(255,255,255,.12); background:rgba(255,255,255,.04); min-width:116px; }
+      .history-card.win { border-color:rgba(123,245,155,.75); box-shadow:0 0 0 1px rgba(123,245,155,.35); }
+      .history-card.loss { border-color:rgba(245,123,123,.6); box-shadow:0 0 0 1px rgba(245,123,123,.28); }
+      .history-card.draw { border-color:rgba(125,155,245,.45); box-shadow:0 0 0 1px rgba(125,155,245,.25); }
+      .history-card-img { width:52px; height:72px; border-radius:8px; background-size:cover; background-position:center; box-shadow:0 4px 8px rgba(0,0,0,.35); }
+      .history-card-label { display:flex; flex-direction:column; gap:4px; }
+      .history-card-name { font-weight:700; font-size:12px; text-transform:uppercase; letter-spacing:0.2px; opacity:.9; }
+      .history-card-outcome { font-size:11px; opacity:.8; letter-spacing:0.3px; }
       .history-win { background:rgba(123,245,155,.12); border-color:rgba(123,245,155,.55); }
       .history-loss { background:rgba(245,123,123,.12); border-color:rgba(245,123,123,.5); }
       .history-draw { background:rgba(125,155,245,.08); border-color:rgba(125,155,245,.35); }

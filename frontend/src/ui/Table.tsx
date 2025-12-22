@@ -11,6 +11,7 @@ export default function Table({ room, snap, youName }:{ room:string; snap:any; y
   const opp  = players.find(p => p.id !== snap?.you);
 
   const [opponentLocked, setOpponentLocked] = useState(false);
+  const [pendingPick, setPendingPick] = useState<string | null>(null);
   useEffect(() => {
     const onLock = () => setOpponentLocked(true);
     socket.on("opponent:locked", onLock);
@@ -37,13 +38,28 @@ export default function Table({ room, snap, youName }:{ room:string; snap:any; y
     p?.role === "SLAVE_SIDE" ? "slave side" : "unassigned";
 
   function start(){ socket.emit("game:start", { room }); }
-  function play(card: string){ socket.emit("game:pick", { room, card }); }
+  function play(card: string){
+    if (yourPick || pendingPick) return;
+    setPendingPick(card);
+    socket.emit("game:pick", { room, card });
+  }
   function rematch(){ socket.emit("game:rematch", { room }); }
 
   const yourPick = snap?.picks ? snap.picks[you?.id || ""] : null;
   const oppPick = snap?.picks ? snap.picks[opp?.id || ""] : null;
-  const youPicked = Boolean(yourPick);
+  const selectedPick = yourPick || pendingPick;
+  const youPicked = Boolean(selectedPick);
   const opponentPicked = Boolean(oppPick);
+
+  useEffect(() => {
+    if (!yourPick) return;
+    setPendingPick(yourPick);
+  }, [yourPick]);
+
+  useEffect(() => {
+    setPendingPick(null);
+    setOpponentLocked(false);
+  }, [history.length, snap?.state?.phase, snap?.state?.setIndex, snap?.state?.roundInSet]);
 
   useEffect(() => {
     if (!opponentPicked) setOpponentLocked(false);
@@ -88,7 +104,7 @@ export default function Table({ room, snap, youName }:{ room:string; snap:any; y
           {lockHint && <div className={`muted lock-hint ${opponentPicked || opponentLocked ? "lock-alert" : ""}`} style={{ marginTop: 6 }}>{lockHint}</div>}
           <div className="hand" style={{gap:16}}>
             {hand.map((c, i)=>(
-              <Card key={i} kind={c as any} selected={yourPick === c} disabled={Boolean(yourPick)} onClick={()=>play(c)} />
+              <Card key={i} kind={c as any} selected={selectedPick === c} disabled={Boolean(selectedPick)} onClick={()=>play(c)} />
             ))}
           </div>
 

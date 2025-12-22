@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { socket } from "../api/socket";
 import Card from "./Card";
 
@@ -9,6 +9,13 @@ export default function Table({ room, snap, youName }:{ room:string; snap:any; y
   const players: Player[] = snap?.players || [];
   const you = players.find(p => p.id === snap?.you);
   const opp  = players.find(p => p.id !== snap?.you);
+
+  const [opponentLocked, setOpponentLocked] = useState(false);
+  useEffect(() => {
+    const onLock = () => setOpponentLocked(true);
+    socket.on("opponent:locked", onLock);
+    return () => socket.off("opponent:locked", onLock);
+  }, []);
 
   const hand: string[] = snap?.hand || [];
   const phase: "sets" | "tiebreak" | "done" | undefined = snap?.state?.phase;
@@ -35,7 +42,19 @@ export default function Table({ room, snap, youName }:{ room:string; snap:any; y
 
   const yourPick = snap?.picks ? snap.picks[you?.id || ""] : null;
   const oppPick = snap?.picks ? snap.picks[opp?.id || ""] : null;
-  const lockHint = yourPick && !oppPick ? "waiting for opponent..." : (!yourPick && oppPick ? "opponent locked" : "");
+  const youPicked = Boolean(yourPick);
+  const opponentPicked = Boolean(oppPick);
+
+  useEffect(() => {
+    if (!opponentPicked) setOpponentLocked(false);
+  }, [opponentPicked]);
+
+  const lockHint = useMemo(() => {
+    if (youPicked && opponentPicked) return "both players locked in.";
+    if (youPicked && !opponentPicked) return "you locked in — waiting for opponent...";
+    if (!youPicked && (opponentPicked || opponentLocked)) return `${opp?.name || "opponent"} locked in — choose your card!`;
+    return "";
+  }, [youPicked, opponentPicked, opponentLocked, opp?.name]);
 
   return <div>
     <div className="row" style={{justifyContent:"space-between"}}>
@@ -66,10 +85,10 @@ export default function Table({ room, snap, youName }:{ room:string; snap:any; y
       ) : (
         <>
           <div className="muted">your hand:</div>
-          {lockHint && <div className="muted" style={{ marginTop: 6 }}>{lockHint}</div>}
+          {lockHint && <div className={`muted lock-hint ${opponentPicked || opponentLocked ? "lock-alert" : ""}`} style={{ marginTop: 6 }}>{lockHint}</div>}
           <div className="hand" style={{gap:16}}>
             {hand.map((c, i)=>(
-              <Card key={i} kind={c as any} onClick={()=>play(c)} />
+              <Card key={i} kind={c as any} selected={yourPick === c} disabled={Boolean(yourPick)} onClick={()=>play(c)} />
             ))}
           </div>
 
@@ -79,12 +98,22 @@ export default function Table({ room, snap, youName }:{ room:string; snap:any; y
 
           <div>
             <div className="muted">history:</div>
-            <div className="grid">
-              {history.map((h:any, idx:number)=>(
-                <div key={idx} className="pill">
-                  {h.round?.set ? `s${h.round.set} r${h.round.inSet}` : "r?"}: {h.flavor || "…"}
-                </div>
-              ))}
+            <div className="history-list">
+              {history.map((h:any, idx:number)=>{
+                const isLatest = idx === history.length - 1;
+                const draw = !h.winnerId;
+                const youWon = h.winnerId && h.winnerId === you?.id;
+                const tone = draw ? "history-draw" : youWon ? "history-win" : "history-loss";
+
+                return (
+                  <div key={idx} className={`history-item ${tone} ${isLatest ? "history-latest" : ""}`}>
+                    <div className="history-round">{h.round?.set ? `set ${h.round.set} • round ${h.round.inSet}` : "r?"}</div>
+                    <div className="history-flavor">{h.flavor || "…"}</div>
+                    {!draw && <div className="history-result">{youWon ? "you win" : `${opp?.name || "opponent"} wins`}</div>}
+                    {draw && <div className="history-result">draw</div>}
+                  </div>
+                );
+              })}
             </div>
           </div>
         </>

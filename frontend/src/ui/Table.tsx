@@ -2,8 +2,27 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { socket } from "../api/socket";
 import Card from "./Card";
+import emperorImg from "../assets/card-emperor.jpg";
+import slaveImg   from "../assets/card-slave.jpg";
+import citizenImg from "../assets/card-citizen.jpg";
 
 type Player = { id: string; name: string; role?: "EMPEROR_SIDE" | "SLAVE_SIDE" };
+
+const IMG: Record<string, string> = { EMPEROR: emperorImg, SLAVE: slaveImg, CITIZEN: citizenImg };
+
+type HistoryCardProps = { card: "EMPEROR" | "SLAVE" | "CITIZEN"; result: "win" | "loss" | "draw"; label?: string };
+
+function HistoryCard({ card, result, label }: HistoryCardProps){
+  return (
+    <div className={`history-card ${result}`}>
+      <div className="history-card-img" aria-label={card.toLowerCase()} role="img" style={{ backgroundImage: `url(${IMG[card]})` }} />
+      <div className="history-card-label">
+        <span className="history-card-name">{label || card.toLowerCase()}</span>
+        <span className="history-card-outcome">{result}</span>
+      </div>
+    </div>
+  );
+}
 
 export default function Table({ room, snap, youName }:{ room:string; snap:any; youName:string }){
   const players: Player[] = snap?.players || [];
@@ -72,6 +91,28 @@ export default function Table({ room, snap, youName }:{ room:string; snap:any; y
     return "";
   }, [youPicked, opponentPicked, opponentLocked, opp?.name]);
 
+  const nameById = useMemo(() => {
+    const map: Record<string,string> = {};
+    for (const p of players) map[p.id] = p.name;
+    return map;
+  }, [players]);
+
+  const groupedHistory = useMemo(() => {
+    const groups: { key:string; set:number; round:number; entries:any[] }[] = [];
+    for (const h of history) {
+      const setNum = h.round?.set ?? 0;
+      const roundNum = h.round?.inSet ?? 0;
+      const key = `${setNum}-${roundNum}`;
+      let group = groups.find(g => g.key === key);
+      if (!group) {
+        group = { key, set: setNum, round: roundNum, entries: [] };
+        groups.push(group);
+      }
+      group.entries.push(h);
+    }
+    return groups.reverse();
+  }, [history]);
+
   return <div>
     <div className="row" style={{justifyContent:"space-between"}}>
       <div className="row">
@@ -114,19 +155,41 @@ export default function Table({ room, snap, youName }:{ room:string; snap:any; y
 
           <div>
             <div className="muted">history:</div>
+            {groupedHistory.length === 0 && <div className="history-empty">no rounds played yet.</div>}
             <div className="history-list">
-              {history.map((h:any, idx:number)=>{
-                const isLatest = idx === history.length - 1;
-                const draw = !h.winnerId;
-                const youWon = h.winnerId && h.winnerId === you?.id;
+              {groupedHistory.map((group, gIdx) => {
+                const latestEntry = group.entries[group.entries.length - 1];
+                const draw = !latestEntry.winnerId;
+                const youWon = latestEntry.winnerId && latestEntry.winnerId === you?.id;
                 const tone = draw ? "history-draw" : youWon ? "history-win" : "history-loss";
 
                 return (
-                  <div key={idx} className={`history-item ${tone} ${isLatest ? "history-latest" : ""}`}>
-                    <div className="history-round">{h.round?.set ? `set ${h.round.set} • round ${h.round.inSet}` : "r?"}</div>
-                    <div className="history-flavor">{h.flavor || "…"}</div>
-                    {!draw && <div className="history-result">{youWon ? "you win" : `${opp?.name || "opponent"} wins`}</div>}
-                    {draw && <div className="history-result">draw</div>}
+                  <div key={group.key} className={`history-round-segment ${tone} ${gIdx === 0 ? "history-latest" : ""}`}>
+                    <div className="history-round-header">
+                      <div className="history-round-line" />
+                      <div className="history-round-label">ROUND {group.round} • SET {group.set}</div>
+                      <div className="history-round-line" />
+                    </div>
+                    <div className="history-hands-row">
+                      {group.entries.map((h:any, idx:number) => {
+                        const isDraw = !h.winnerId;
+                        const aResult = isDraw ? "draw" : (h.winnerId === h.a.id ? "win" : "loss");
+                        const bResult = isDraw ? "draw" : (h.winnerId === h.b.id ? "win" : "loss");
+                        const youWonThis = h.winnerId && h.winnerId === you?.id;
+                        const resultLine = isDraw ? "draw" : youWonThis ? "you win" : `${opp?.name || "opponent"} wins`;
+                        return (
+                          <div key={idx} className="history-hand">
+                            <div className="history-hand-cards">
+                              <HistoryCard card={h.a.card} result={aResult} label={nameById[h.a.id] || "player"} />
+                              <div className="history-versus">vs</div>
+                              <HistoryCard card={h.b.card} result={bResult} label={nameById[h.b.id] || "player"} />
+                            </div>
+                            <div className="history-flavor">{h.flavor || "…"}</div>
+                            <div className="history-result">{resultLine}</div>
+                          </div>
+                        );
+                      })}
+                    </div>
                   </div>
                 );
               })}

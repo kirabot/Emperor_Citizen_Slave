@@ -1,17 +1,17 @@
-
 services:
   api:
     build: ./backend
     environment:
       NODE_ENV: production
       PORT: 8080
-      FRONTEND_ORIGIN: "*"
+      FRONTEND_ORIGIN: "http://178.254.142.4:5173"  # exact origin
     ports:
       - "8080:8080"
+
   web:
     build:
       context: ./frontend
       args:
-        VITE_BACKEND_URL: "http://localhost:8080"
+        VITE_BACKEND_URL: "http://178.254.142.4:8080"
     ports:
       - "5173:80"

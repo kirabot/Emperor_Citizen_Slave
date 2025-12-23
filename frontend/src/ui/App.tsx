@@ -12,6 +12,27 @@ export default function App(){
   const [name, setName] = useState<string>("");
   const [snap, setSnap] = useState<State|null>(null);
   const [spectator, setSpectator] = useState<boolean>(false);
+  const fallbackCopy = (text: string) => {
+    const tmp = document.createElement("textarea");
+    tmp.value = text;
+    tmp.setAttribute("readonly", "true");
+    tmp.style.position = "absolute";
+    tmp.style.left = "-9999px";
+    document.body.appendChild(tmp);
+    tmp.select();
+    document.execCommand("copy");
+    document.body.removeChild(tmp);
+  };
+
+  const copyInvite = (text: string) => {
+    if (!text) return;
+
+    if (navigator.clipboard?.writeText) {
+      navigator.clipboard.writeText(text).catch(() => fallbackCopy(text));
+    } else {
+      fallbackCopy(text);
+    }
+  };
 
   useEffect(() => {
     const onState = (s:any)=> setSnap(s);
@@ -45,8 +66,7 @@ export default function App(){
           <div className="pill">You: {name}</div>
         </div>
         <div className="row" style={{ gap: 8 }}>
-          <button onClick={()=>navigator.clipboard.writeText(room)}>Copy Code</button>
-          <button onClick={()=>inviteLink && navigator.clipboard.writeText(inviteLink)}>Copy Invite Link</button>
+          <button onClick={()=>copyInvite(inviteLink)}>Copy Invite Link</button>
         </div>
       </div>
       <div className="sep"></div>

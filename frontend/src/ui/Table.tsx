@@ -2,6 +2,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { socket } from "../api/socket";
 import Card from "./Card";
+import Rulebook from "./Rulebook";
 import emperorImg from "../assets/card-emperor.jpg";
 import slaveImg   from "../assets/card-slave.jpg";
 import citizenImg from "../assets/card-citizen.jpg";
@@ -28,8 +29,11 @@ function HistoryCard({ card, result, label }: HistoryCardProps){
 
 export default function Table({ room, snap, youName, spectator }:{ room:string; snap:any; youName:string; spectator?: boolean }){
   const players: Player[] = snap?.players || [];
-  const you = players.find(p => p.id === snap?.you);
-  const opp  = players.find(p => p.id !== snap?.you);
+  const youId = snap?.you;
+  const you = youId
+    ? players.find(p => p.id === youId)
+    : (!isSpectator ? (players.find(p => p.name === youName) || players[0]) : undefined);
+  const opp  = players.find(p => p.id !== you?.id);
   const spectatorList: Player[] = (snap?.spectators || []) as Player[];
   const isSpectator = Boolean(spectator);
 
@@ -233,7 +237,11 @@ export default function Table({ room, snap, youName, spectator }:{ room:string; 
         )}
       </>
     ) : (
-      <div className="muted">Waiting for both players to be ready.</div>
+      <>
+        <div className="muted">Waiting for both players to be ready.</div>
+        <div className="sep"></div>
+        <Rulebook />
+      </>
     )}
   </div>;
 }

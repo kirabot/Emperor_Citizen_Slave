@@ -61,11 +61,12 @@ const rooms = new Map();
 function randomCode(){ return Math.random().toString(36).slice(2, 6).toUpperCase(); }
 
 function roomSnapshot(room){
-  if (!room.state) return { code: room.code, players: room.players.map(p=>({id:p.id,name:p.name,role:p.role})), state:null };
+  if (!room.state) return { code: room.code, players: room.players.map(p=>({id:p.id,name:p.name,role:p.role})), spectators: room.spectators.map(s=>({id:s.id,name:s.name})), state:null };
   const s = room.state;
   return {
     code: room.code,
     players: room.players.map(p=>({id:p.id,name:p.name,role:p.role})),
+    spectators: room.spectators.map(s=>({id:s.id,name:s.name})),
     state: {
       phase: s.phase,
       setIndex: s.setIndex,
@@ -96,7 +97,7 @@ function tailoredState(room, forId){
 io.on("connection", (socket) => {
   socket.on("guest:create", ({ name }, cb) => {
     const code = randomCode();
-    const room = { code, players: [{ id: socket.id, name: String(name||"guest") }], state: null };
+    const room = { code, players: [{ id: socket.id, name: String(name||"guest") }], spectators: [], state: null };
     rooms.set(code, room);
     socket.join(code);
     cb?.({ room: code });
@@ -106,16 +107,23 @@ io.on("connection", (socket) => {
   socket.on("guest:join", ({ room: code, name }, cb) => {
     const room = rooms.get(String(code || "").toUpperCase());
     if (!room) return cb?.({ error: "room not found" });
-    if (room.players.length >= 2) return cb?.({ error: "room full" });
-    room.players.push({ id: socket.id, name: String(name||"guest") });
+    const entrant = { id: socket.id, name: String(name||"guest") };
+    let spectator = false;
+    if (room.players.length >= 2) {
+      room.spectators.push(entrant);
+      spectator = true;
+    } else {
+      room.players.push(entrant);
+    }
     socket.join(room.code);
-    cb?.({ ok: true });
+    cb?.({ ok: true, spectator });
     io.to(room.code).emit("room:update", roomSnapshot(room));
   });
 
   socket.on("game:start", ({ room: code }, cb) => {
     const room = rooms.get(code);
     if (!room) return;
+    if (!room.players.some(p => p.id === socket.id)) return cb?.({ error: "only players can start" });
     if (room.players.length !== 2) return cb?.({ error: "need 2 players" });
     const [p1, p2] = room.players;
     if (Math.random() < 0.5) { p1.role = "EMPEROR_SIDE"; p2.role = "SLAVE_SIDE"; }
@@ -138,6 +146,7 @@ io.on("connection", (socket) => {
   socket.on("game:pick", ({ room: code, card }, cb) => {
     const room = rooms.get(code);
     if (!room || !room.state) return;
+    if (!room.players.some(p => p.id === socket.id)) return cb?.({ error: "spectators cannot play" });
     const myHand = room.state.hands[socket.id] || [];
     if (!myHand.includes(card)) return cb?.({ error: "card not in hand" });
     room.state.picks[socket.id] = card;
@@ -224,7 +233,7 @@ io.on("connection", (socket) => {
           if (w1 !== w2) {
             const matchWinner = (w1 > w2) ? p1.id : p2.id;
             room.state.matchWinner = matchWinner;
-            room.state.matchFlavor = `match over — ${playerName(room, matchWinner)} wins ${w1}-${w2}.`;
+            room.state.matchFlavor = `Match Over — ${playerName(room, matchWinner)} wins ${w1}-${w2}.`;
             room.state.phase = "done";
             return push(room);
           } else {
@@ -257,7 +266,7 @@ io.on("connection", (socket) => {
 
       if (room.state.phase === "tiebreak") {
         room.state.matchWinner = winnerId;
-        room.state.matchFlavor = `sudden death — ${base} ${winName} WINS.`;
+        room.state.matchFlavor = `Sudden Death — ${base} ${winName} wins.`;
         room.state.phase = "done";
         return push(room);
       }
@@ -281,7 +290,7 @@ io.on("connection", (socket) => {
       if (w1 !== w2) {
         const matchWinner = (w1 > w2) ? p1.id : p2.id;
         room.state.matchWinner = matchWinner;
-        room.state.matchFlavor = `match over — ${playerName(room, matchWinner)} wins ${w1}-${w2}.`;
+        room.state.matchFlavor = `Match Over — ${playerName(room, matchWinner)} wins ${w1}-${w2}.`;
         room.state.phase = "done";
         return push(room);
       }
@@ -301,6 +310,7 @@ io.on("connection", (socket) => {
   socket.on("game:rematch", ({ room: code }) => {
     const room = rooms.get(code);
     if (!room || room.players.length !== 2) return;
+    if (!room.players.some(p => p.id === socket.id)) return;
     const [p1, p2] = room.players;
     if (Math.random() < 0.5) { p1.role = "EMPEROR_SIDE"; p2.role = "SLAVE_SIDE"; }
     else { p1.role = "SLAVE_SIDE"; p2.role = "EMPEROR_SIDE"; }
@@ -323,8 +333,10 @@ io.on("connection", (socket) => {
     for (const [code, room] of rooms) {
       const before = room.players.length;
       room.players = room.players.filter(p => p.id !== socket.id);
-      if (room.players.length === 0) rooms.delete(code);
-      else if (room.players.length !== before) io.to(code).emit("room:update", roomSnapshot(room));
+      const spectatorBefore = room.spectators.length;
+      room.spectators = room.spectators.filter(s => s.id !== socket.id);
+      if (room.players.length === 0 && room.spectators.length === 0) rooms.delete(code);
+      else if (room.players.length !== before || room.spectators.length !== spectatorBefore) io.to(code).emit("room:update", roomSnapshot(room));
     }
   });
 });

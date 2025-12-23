@@ -11,6 +11,7 @@ export default function App(){
   const [room, setRoom] = useState<string>("");
   const [name, setName] = useState<string>("");
   const [snap, setSnap] = useState<State|null>(null);
+  const [spectator, setSpectator] = useState<boolean>(false);
 
   useEffect(() => {
     const onState = (s:any)=> setSnap(s);
@@ -23,7 +24,7 @@ export default function App(){
   if (!room) {
     return <div className="app">
       <div className="card">
-        <Lobby onReady={(r,n)=>{ setRoom(r); setName(n); }} />
+        <Lobby onReady={(r,n,s)=>{ setRoom(r); setName(n); setSpectator(Boolean(s)); }} />
       </div>
     </div>;
   }
@@ -32,13 +33,13 @@ export default function App(){
     <div className="card">
       <div className="row" style={{justifyContent:"space-between"}}>
         <div className="row">
-          <div className="pill">room {room}</div>
-          <div className="pill">you: {name}</div>
+          <div className="pill">Room {room}</div>
+          <div className="pill">You: {name}</div>
         </div>
-        <button onClick={()=>navigator.clipboard.writeText(room)}>copy code</button>
+        <button onClick={()=>navigator.clipboard.writeText(room)}>Copy Code</button>
       </div>
       <div className="sep"></div>
-      <Table room={room} snap={snap} youName={name} />
+      <Table room={room} snap={snap} youName={name} spectator={spectator} />
     </div>
   </div>;
 }

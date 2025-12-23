@@ -48,22 +48,30 @@ export default function Lobby({ onReady }:{ onReady:(room:string, name:string, s
   const [room, setRoom] = useState("");
 
   return <div>
-    <h2 className="big">Emperor Citizen Slave</h2>
-    <p className="muted">No accounts needed. Share a 4-letter code with a friend.</p>
-    <div className="row" style={{marginTop:12}}>
-      <input placeholder="Your Name" value={name} onChange={e=>setName(e.target.value)} />
-      <button disabled={!name} onClick={()=>{
-        socket.emit("guest:create", { name }, ({ room }) => onReady(room, name, false));
-      }}>Create Room</button>
-    </div>
-    <div className="sep"></div>
-    <div className="row">
-      <input placeholder="Enter Room Code" value={room} onChange={e=>setRoom(e.target.value.toUpperCase())} />
-      <button disabled={!name || room.length < 4} onClick={()=>{
-        socket.emit("guest:join", { room, name }, (res:any)=>{
-          if (res?.error) alert(res.error); else onReady(room, name, res?.spectator);
-        })
-      }}>Join</button>
+    <div className="hero-stack">
+      <h1 className="display">Emperor Citizen Slave</h1>
+      <p className="lead">Host or join a room with a 4-letter code.</p>
+      <div className="hero-name">
+        <div className="input-label">Your Name</div>
+        <input placeholder="Your Name" value={name} onChange={e=>setName(e.target.value)} />
+      </div>
+      <div className="hero-actions">
+        <button className="cta-button" disabled={!name} onClick={()=>{
+          socket.emit("guest:create", { name }, ({ room }) => onReady(room, name, false));
+        }}>Create Room</button>
+        <div className="or-divider">or</div>
+        <div className="join-panel">
+          <div className="input-label">Enter a Room Code</div>
+          <div className="row">
+            <input placeholder="Room Code" value={room} onChange={e=>setRoom(e.target.value.toUpperCase())} />
+            <button disabled={!name || room.length < 4} onClick={()=>{
+              socket.emit("guest:join", { room, name }, (res:any)=>{
+                if (res?.error) alert(res.error); else onReady(room, name, res?.spectator);
+              })
+            }}>Join</button>
+          </div>
+        </div>
+      </div>
     </div>
 
     <div className="sep"></div>

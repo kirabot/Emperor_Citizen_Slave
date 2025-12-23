@@ -14,11 +14,11 @@ export default function Lobby({ onReady }:{ onReady:(room:string, name:string, s
     <div className="hero-stack">
       <h1 className="display">Emperor Citizen Slave</h1>
       <p className="lead">Host or join a room with a 4-letter code.</p>
-      <div className="hero-name">
+      <div className="hero-name hero-band">
         <div className="input-label">Your Name</div>
         <input placeholder="Your Name" value={name} onChange={e=>setName(e.target.value)} />
       </div>
-      <div className="hero-actions">
+      <div className="hero-actions hero-band">
         <button className="cta-button" disabled={!name} onClick={()=>{
           socket.emit("guest:create", { name }, ({ room }) => onReady(room, name, false));
         }}>Create Room</button>

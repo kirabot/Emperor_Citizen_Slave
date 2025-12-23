@@ -35,6 +35,7 @@ export default function Table({ room, snap, youName, spectator }:{ room:string; 
 
   const [opponentLocked, setOpponentLocked] = useState(false);
   const [pendingPick, setPendingPick] = useState<string | null>(null);
+  const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   useEffect(() => {
     const onLock = () => setOpponentLocked(true);
     socket.on("opponent:locked", onLock);
@@ -64,9 +65,10 @@ export default function Table({ room, snap, youName, spectator }:{ room:string; 
     p?.role === "SLAVE_SIDE" ? "Slave Side" : "Unassigned";
 
   function start(){ socket.emit("game:start", { room }); }
-  function play(card: string){
+  function play(card: string, idx: number){
     if (isSpectator || yourPick || pendingPick) return;
     setPendingPick(card);
+    setSelectedIndex(idx);
     socket.emit("game:pick", { room, card });
   }
   function rematch(){ socket.emit("game:rematch", { room }); }
@@ -80,10 +82,16 @@ export default function Table({ room, snap, youName, spectator }:{ room:string; 
   useEffect(() => {
     if (!yourPick) return;
     setPendingPick(yourPick);
-  }, [yourPick]);
+    setSelectedIndex(prev => {
+      if (prev !== null && hand[prev] === yourPick) return prev;
+      const idx = hand.findIndex(c => c === yourPick);
+      return idx >= 0 ? idx : prev;
+    });
+  }, [yourPick, hand]);
 
   useEffect(() => {
     setPendingPick(null);
+    setSelectedIndex(null);
     setOpponentLocked(false);
   }, [history.length, snap?.state?.phase, snap?.state?.setIndex, snap?.state?.roundInSet]);
 
@@ -212,7 +220,7 @@ export default function Table({ room, snap, youName, spectator }:{ room:string; 
             {lockHint && <div className={`muted lock-hint ${opponentPicked || opponentLocked ? "lock-alert" : ""}`} style={{ marginTop: 6 }}>{lockHint}</div>}
             <div className="hand" style={{gap:16}}>
               {hand.map((c, i)=>(
-                <Card key={i} kind={c as any} selected={selectedPick === c} disabled={Boolean(selectedPick)} onClick={()=>play(c)} />
+                <Card key={i} kind={c as any} selected={selectedIndex === i} disabled={Boolean(selectedPick)} onClick={()=>play(c, i)} />
               ))}
             </div>
 

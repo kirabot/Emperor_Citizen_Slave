@@ -1,5 +1,5 @@
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import Lobby from "./Lobby";
 import Table from "./Table";
 import { socket } from "../api/socket";
@@ -21,6 +21,14 @@ export default function App(){
     return () => { socket.off("state", onState); socket.off("room:update", onUpdate); };
   }, []);
 
+  const inviteLink = useMemo(() => {
+    if (!room) return "";
+    const url = new URL(window.location.href);
+    url.searchParams.set("room", room);
+    url.hash = "";
+    return url.toString();
+  }, [room]);
+
   if (!room) {
     return <div className="app">
       <div className="card">
@@ -36,7 +44,10 @@ export default function App(){
           <div className="pill">Room {room}</div>
           <div className="pill">You: {name}</div>
         </div>
-        <button onClick={()=>navigator.clipboard.writeText(room)}>Copy Code</button>
+        <div className="row" style={{ gap: 8 }}>
+          <button onClick={()=>navigator.clipboard.writeText(room)}>Copy Code</button>
+          <button onClick={()=>inviteLink && navigator.clipboard.writeText(inviteLink)}>Copy Invite Link</button>
+        </div>
       </div>
       <div className="sep"></div>
       <Table room={room} snap={snap} youName={name} spectator={spectator} />

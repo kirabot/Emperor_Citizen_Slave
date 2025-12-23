@@ -5,7 +5,10 @@ import Rulebook from "./Rulebook";
 
 export default function Lobby({ onReady }:{ onReady:(room:string, name:string, spectator?: boolean)=>void }){
   const [name, setName] = useState("");
-  const [room, setRoom] = useState("");
+  const [room, setRoom] = useState(() => {
+    const param = new URLSearchParams(window.location.search).get("room");
+    return param ? param.toUpperCase() : "";
+  });
 
   return <div>
     <div className="hero-stack">

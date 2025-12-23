@@ -30,12 +30,12 @@ function HistoryCard({ card, result, label }: HistoryCardProps){
 export default function Table({ room, snap, youName, spectator }:{ room:string; snap:any; youName:string; spectator?: boolean }){
   const players: Player[] = snap?.players || [];
   const youId = snap?.you;
+  const isSpectator = Boolean(spectator);
   const you = youId
     ? players.find(p => p.id === youId)
     : (!isSpectator ? (players.find(p => p.name === youName) || players[0]) : undefined);
   const opp  = players.find(p => p.id !== you?.id);
   const spectatorList: Player[] = (snap?.spectators || []) as Player[];
-  const isSpectator = Boolean(spectator);
 
   const [opponentLocked, setOpponentLocked] = useState(false);
   const [pendingPick, setPendingPick] = useState<string | null>(null);

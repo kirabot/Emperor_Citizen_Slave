@@ -52,9 +52,9 @@ export default function Rulebook(){
       </div>
 
       <div className="info-grid">
-        <div className="info-block">
+        <div className="info-block narrative">
           <div className="info-title">Quick objective</div>
-          <ul className="info-list">
+          <ul className="info-list narrative-list">
             <li>Two players face off across four sets of three rounds each. The Emperor side wins with the single Emperor card but fears the Slave.</li>
             <li>The Slave side wins with the lone Slave card but loses to Citizen cards. Citizens outnumber everything.</li>
             <li>Each round, both players secretly choose a card. Reveal determines the winner instantly—there are no combos or turns.</li>
@@ -128,9 +128,9 @@ export default function Rulebook(){
           </div>
         </div>
 
-        <div className="info-block">
+        <div className="info-block narrative">
           <div className="info-title">Flow of play</div>
-          <ul className="info-list">
+          <ul className="info-list narrative-list">
             <li>Pick your side: Emperor player gets one Emperor card; Slave player gets one Slave card. Both receive four Citizens.</li>
             <li>Select a card each round and lock it in. Once both are locked, cards are revealed and the result is recorded.</li>
             <li>Each set runs for three rounds, and a full match spans four sets. Win more rounds than your opponent, and the overall match goes to the player who wins the majority of sets.</li>

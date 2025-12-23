@@ -12,6 +12,17 @@ export default function App(){
   const [name, setName] = useState<string>("");
   const [snap, setSnap] = useState<State|null>(null);
   const [spectator, setSpectator] = useState<boolean>(false);
+  const resetToStart = () => {
+    setRoom("");
+    setName("");
+    setSnap(null);
+    setSpectator(false);
+
+    const url = new URL(window.location.href);
+    url.searchParams.delete("room");
+    url.hash = "";
+    window.history.replaceState(null, "", url.toString());
+  };
   const fallbackCopy = (text: string) => {
     const tmp = document.createElement("textarea");
     tmp.value = text;
@@ -66,6 +77,7 @@ export default function App(){
           <div className="pill">You: {name}</div>
         </div>
         <div className="row" style={{ gap: 8 }}>
+          <button onClick={resetToStart}>Back to Start</button>
           <button onClick={()=>copyInvite(inviteLink)}>Copy Invite Link</button>
         </div>
       </div>

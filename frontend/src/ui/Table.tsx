@@ -40,6 +40,8 @@ export default function Table({ room, snap, youName, spectator }:{ room:string; 
   const [opponentLocked, setOpponentLocked] = useState(false);
   const [pendingPick, setPendingPick] = useState<string | null>(null);
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
+  const [prematureOver, setPrematureOver] = useState(false);
+  const [dismissedPremature, setDismissedPremature] = useState(false);
   useEffect(() => {
     const onLock = () => setOpponentLocked(true);
     socket.on("opponent:locked", onLock);
@@ -56,6 +58,7 @@ export default function Table({ room, snap, youName, spectator }:{ room:string; 
   const matchFlavor: string | null | undefined = snap?.state?.matchFlavor ?? null;
   const matchWinnerName = matchWinner ? players.find(p => p.id === matchWinner)?.name : null;
   const roundLabel = phase === "tiebreak" ? "Sudden Death" : `Set ${setIdx} / ${snap?.state?.totalSets || 4} • Round ${inSet} / ${snap?.state?.roundsPerSet || 3}`;
+  const gameActive = Boolean(snap?.state && snap.state.phase !== "done");
 
   const canStart = players.length === 2 && !snap?.state && !isSpectator;
   const remaining = snap?.opponentRemaining || null;
@@ -102,6 +105,21 @@ export default function Table({ room, snap, youName, spectator }:{ room:string; 
   useEffect(() => {
     if (!opponentPicked) setOpponentLocked(false);
   }, [opponentPicked]);
+
+  useEffect(() => {
+    if (!gameActive) {
+      setPrematureOver(false);
+      setDismissedPremature(false);
+      return;
+    }
+
+    if (players.length < 2 && !dismissedPremature) {
+      setPrematureOver(true);
+    } else if (players.length >= 2) {
+      setPrematureOver(false);
+      setDismissedPremature(false);
+    }
+  }, [gameActive, players.length, dismissedPremature]);
 
   const lockHint = useMemo(() => {
     if (isSpectator) return "You are spectating this match.";
@@ -181,6 +199,19 @@ export default function Table({ room, snap, youName, spectator }:{ room:string; 
   const spectatorCount = spectatorList.length;
 
   return <div>
+    {prematureOver && (
+      <div className="modal-backdrop" role="alertdialog" aria-labelledby="premature-title" aria-describedby="premature-body">
+        <div className="modal">
+          <div id="premature-title" className="modal-title">Match Ended Early</div>
+          <div id="premature-body" className="modal-body">
+            The game is over because a player left before the match finished. Start a rematch or open a new room to continue playing.
+          </div>
+          <div className="row" style={{ justifyContent: "flex-end" }}>
+            <button onClick={() => { setPrematureOver(false); setDismissedPremature(true); }}>Got it</button>
+          </div>
+        </div>
+      </div>
+    )}
     <div className="row" style={{justifyContent:"space-between"}}>
       <div className="row">
         <div className="pill">{you?.name || youName} • {roleLabel(you)}</div>

@@ -2,27 +2,27 @@
 import React, { useState } from "react";
 import { socket } from "../api/socket";
 
-export default function Lobby({ onReady }:{ onReady:(room:string, name:string)=>void }){
+export default function Lobby({ onReady }:{ onReady:(room:string, name:string, spectator?: boolean)=>void }){
   const [name, setName] = useState("");
   const [room, setRoom] = useState("");
 
   return <div>
-    <h2 className="big">e-card (guest)</h2>
-    <p className="muted">no accounts. share a 4-letter code with a friend.</p>
+    <h2 className="big">E-Card (Guest)</h2>
+    <p className="muted">No accounts needed. Share a 4-letter code with a friend.</p>
     <div className="row" style={{marginTop:12}}>
-      <input placeholder="your name" value={name} onChange={e=>setName(e.target.value)} />
+      <input placeholder="Your Name" value={name} onChange={e=>setName(e.target.value)} />
       <button disabled={!name} onClick={()=>{
-        socket.emit("guest:create", { name }, ({ room }) => onReady(room, name));
-      }}>create room</button>
+        socket.emit("guest:create", { name }, ({ room }) => onReady(room, name, false));
+      }}>Create Room</button>
     </div>
     <div className="sep"></div>
     <div className="row">
-      <input placeholder="enter room code" value={room} onChange={e=>setRoom(e.target.value.toUpperCase())} />
+      <input placeholder="Enter Room Code" value={room} onChange={e=>setRoom(e.target.value.toUpperCase())} />
       <button disabled={!name || room.length < 4} onClick={()=>{
         socket.emit("guest:join", { room, name }, (res:any)=>{
-          if (res?.error) alert(res.error); else onReady(room, name);
+          if (res?.error) alert(res.error); else onReady(room, name, res?.spectator);
         })
-      }}>join</button>
+      }}>Join</button>
     </div>
   </div>;
 }

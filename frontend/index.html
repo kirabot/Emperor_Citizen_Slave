@@ -3,49 +3,55 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>e-card (guest)</title>
+    <title>E-Card (Guest)</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Philosopher:wght@400;700&display=swap" rel="stylesheet">
     <style>
-      body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif; margin:0; background:#0b0d10; color:#e6e6e6; }
-      .app { max-width: 920px; margin: 0 auto; padding: 24px; }
-      .card { background:#141820; border:1px solid #232838; border-radius:16px; padding:16px; box-shadow: 0 4px 24px rgba(0,0,0,.2); }
+      body { font-family: 'Philosopher', 'Trajan Pro', serif; margin:0; background:radial-gradient(circle at 20% 20%, rgba(68,8,17,.25), transparent 35%), radial-gradient(circle at 80% 0%, rgba(120,12,22,.35), transparent 30%), #050105; color:#f4ece5; letter-spacing:0.15px; }
+      .app { max-width: 960px; margin: 0 auto; padding: 28px 24px; }
+      .card { background:linear-gradient(140deg, rgba(18,0,8,.96), rgba(10,0,14,.92)); border:1px solid #2f0a18; border-radius:16px; padding:20px; box-shadow: 0 10px 36px rgba(0,0,0,.55); }
       .row { display:flex; gap:12px; align-items:center; flex-wrap:wrap; }
-      input, button { padding:10px 12px; border-radius:10px; border:1px solid #2a3145; background:#0f1320; color:#e6e6e6; }
-      button { cursor:pointer; }
-      button:disabled { opacity: .5; cursor:not-allowed; }
-      .hand { display:flex; gap:12px; margin-top: 12px; }
-      .pill { padding:6px 10px; border-radius:999px; border:1px solid #2a3145; background:#0f1320; font-size:12px; }
-      .sep { height:1px; background:#22283a; margin: 12px 0; }
-      .muted { opacity:.8 }
+      input, button { padding:10px 12px; border-radius:10px; border:1px solid #3a0d1a; background:#12000b; color:#f4ece5; }
+      input::placeholder { color: rgba(244,236,229,.65); }
+      button { cursor:pointer; background:linear-gradient(125deg,#2d0c16,#40111d); border-color:#a31d2a; color:#f8f0e6; font-weight:700; letter-spacing:0.6px; text-transform:uppercase; box-shadow:0 6px 16px rgba(0,0,0,.4); }
+      button:hover:not(:disabled) { box-shadow:0 10px 24px rgba(163,29,42,.35); transform:translateY(-1px); }
+      button:disabled { opacity: .55; cursor:not-allowed; box-shadow:none; }
+      .hand { display:flex; gap:16px; margin-top: 12px; justify-content:space-evenly; align-items:center; width:100%; flex-wrap:wrap; }
+      .pill { padding:6px 12px; border-radius:999px; border:1px solid #5a1b28; background:rgba(27,11,18,.9); font-size:12px; letter-spacing:0.3px; text-transform:uppercase; }
+      .pill.accent { border-color:#a31d2a; color:#fbead6; box-shadow:0 0 0 1px rgba(163,29,42,.4); }
+      .sep { height:1px; background:linear-gradient(90deg, transparent, rgba(226,204,180,.35), transparent); margin: 14px 0; }
+      .muted { opacity:.88; color:#dbcac2; }
       .grid { display:grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap:10px; }
-      .big { font-size:18px; font-weight:600; }
-      .winner { color:#7bf59b; }
-      .danger { color:#f57b7b; }
-      .lock-hint { font-weight:600; letter-spacing:0.2px; }
-      .lock-alert { color:#f0c674; }
-      .history-list { margin-top:10px; display:flex; flex-direction:column; gap:10px; }
-      .history-empty { opacity:.65; font-style:italic; padding:8px 0; }
-      .history-round-segment { padding:12px; border-radius:12px; border:1px solid rgba(255,255,255,.08); background:#10141f; box-shadow:0 4px 12px rgba(0,0,0,.25); display:flex; flex-direction:column; gap:12px; }
-      .history-round-segment.history-latest { border-color:#7bf59b; box-shadow:0 6px 18px rgba(123,245,155,.25); }
-      .history-round-header { display:flex; align-items:center; gap:10px; font-size:12px; letter-spacing:0.3px; text-transform:uppercase; opacity:.85; }
-      .history-round-line { height:1px; background:rgba(255,255,255,.08); flex:1; }
-      .history-round-label { font-weight:800; color:#cdd5f5; white-space:nowrap; }
+      .big { font-size:18px; font-weight:700; color:#f8ecde; letter-spacing:0.4px; }
+      .winner { color:#f8f4eb; }
+      .danger { color:#bf1f3a; }
+      .lock-hint { font-weight:700; letter-spacing:0.3px; }
+      .lock-alert { color:#f0b862; }
+      .history-list { margin-top:10px; display:flex; flex-direction:column; gap:12px; }
+      .history-empty { opacity:.75; font-style:italic; padding:8px 0; }
+      .history-round-segment { padding:14px; border-radius:12px; border:1px solid rgba(255,255,255,.08); background:rgba(12,0,8,.78); box-shadow:0 8px 24px rgba(0,0,0,.32); display:flex; flex-direction:column; gap:12px; }
+      .history-round-segment.history-latest { border-color:#f8f1df; box-shadow:0 8px 24px rgba(248,241,223,.28); }
+      .history-round-header { display:flex; align-items:center; gap:10px; font-size:12px; letter-spacing:0.45px; text-transform:uppercase; opacity:.92; color:#f8ecde; }
+      .history-round-line { height:1px; background:rgba(255,255,255,.12); flex:1; }
+      .history-round-label { font-weight:800; color:#f8f1df; white-space:nowrap; }
       .history-hands-row { display:flex; gap:14px; flex-wrap:wrap; align-items:flex-start; }
-      .history-hand { display:flex; flex-direction:column; gap:6px; padding:10px; border-radius:10px; background:rgba(0,0,0,.16); min-width:240px; }
+      .history-hand { display:flex; flex-direction:column; gap:6px; padding:12px; border-radius:10px; background:rgba(0,0,0,.22); min-width:240px; }
       .history-hand-cards { display:flex; align-items:center; gap:10px; }
-      .history-versus { font-weight:800; text-transform:uppercase; opacity:.75; font-size:12px; letter-spacing:0.4px; }
-      .history-flavor { font-weight:600; line-height:1.4; }
-      .history-result { font-size:12px; text-transform:uppercase; letter-spacing:0.3px; font-weight:700; opacity:.9; }
-      .history-card { display:flex; align-items:center; gap:8px; padding:6px 8px; border-radius:10px; border:1px solid rgba(255,255,255,.12); background:rgba(255,255,255,.04); min-width:116px; }
-      .history-card.win { border-color:rgba(123,245,155,.75); box-shadow:0 0 0 1px rgba(123,245,155,.35); }
-      .history-card.loss { border-color:rgba(245,123,123,.6); box-shadow:0 0 0 1px rgba(245,123,123,.28); }
-      .history-card.draw { border-color:rgba(125,155,245,.45); box-shadow:0 0 0 1px rgba(125,155,245,.25); }
-      .history-card-img { width:52px; height:72px; border-radius:8px; background-size:cover; background-position:center; box-shadow:0 4px 8px rgba(0,0,0,.35); }
+      .history-versus { font-weight:800; text-transform:uppercase; opacity:.85; font-size:12px; letter-spacing:0.4px; color:#f4ece5; }
+      .history-flavor { font-weight:700; line-height:1.4; color:#f4e6d8; }
+      .history-result { font-size:12px; text-transform:uppercase; letter-spacing:0.3px; font-weight:800; opacity:.92; color:#f8f1df; }
+      .history-card { display:flex; align-items:center; gap:8px; padding:6px 8px; border-radius:10px; border:1px solid rgba(255,255,255,.18); background:rgba(255,255,255,.05); min-width:116px; }
+      .history-card.win { border-color:rgba(248,241,223,.95); box-shadow:0 0 0 1px rgba(248,241,223,.4); }
+      .history-card.loss { border-color:rgba(177,18,42,.7); box-shadow:0 0 0 1px rgba(177,18,42,.35); }
+      .history-card.draw { border-color:rgba(130,118,175,.55); box-shadow:0 0 0 1px rgba(130,118,175,.35); }
+      .history-card-img { width:52px; height:72px; border-radius:8px; background-size:cover; background-position:center; box-shadow:0 6px 10px rgba(0,0,0,.35); }
       .history-card-label { display:flex; flex-direction:column; gap:4px; }
-      .history-card-name { font-weight:700; font-size:12px; text-transform:uppercase; letter-spacing:0.2px; opacity:.9; }
-      .history-card-outcome { font-size:11px; opacity:.8; letter-spacing:0.3px; }
-      .history-win { background:rgba(123,245,155,.12); border-color:rgba(123,245,155,.55); }
-      .history-loss { background:rgba(245,123,123,.12); border-color:rgba(245,123,123,.5); }
-      .history-draw { background:rgba(125,155,245,.08); border-color:rgba(125,155,245,.35); }
+      .history-card-name { font-weight:800; font-size:12px; text-transform:uppercase; letter-spacing:0.25px; opacity:.92; }
+      .history-card-outcome { font-size:11px; opacity:.85; letter-spacing:0.35px; }
+      .history-win { background:rgba(248,241,223,.08); border-color:rgba(248,241,223,.55); }
+      .history-loss { background:rgba(177,18,42,.12); border-color:rgba(177,18,42,.6); }
+      .history-draw { background:rgba(130,118,175,.08); border-color:rgba(130,118,175,.45); }
     </style>
   </head>
   <body>

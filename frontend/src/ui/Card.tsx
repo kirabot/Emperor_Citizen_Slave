@@ -7,8 +7,8 @@ import citizenImg from "../assets/card-citizen.jpg";
 const IMG: Record<string,string> = { EMPEROR: emperorImg, SLAVE: slaveImg, CITIZEN: citizenImg };
 
 export default function Card({ kind, disabled, selected, onClick }:{ kind:"EMPEROR"|"SLAVE"|"CITIZEN"; disabled?: boolean; selected?: boolean; onClick?:()=>void }){
-  const glow = selected ? "0 0 0 3px rgba(123,245,155,.45), 0 10px 28px rgba(0,0,0,.55)" : "0 6px 24px rgba(0,0,0,.35)";
-  const outline = selected ? "2px solid #7bf59b" : "1px solid rgba(255,255,255,.08)";
+  const glow = selected ? "0 0 0 3px rgba(248,241,223,.35), 0 10px 28px rgba(0,0,0,.55)" : "0 8px 26px rgba(0,0,0,.4)";
+  const outline = selected ? "2px solid #f8f1df" : "1px solid rgba(255,255,255,.12)";
 
   return (
     <button onClick={onClick} disabled={disabled}

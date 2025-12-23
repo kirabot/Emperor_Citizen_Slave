@@ -52,6 +52,28 @@
       .history-win { background:rgba(248,241,223,.08); border-color:rgba(248,241,223,.55); }
       .history-loss { background:rgba(177,18,42,.12); border-color:rgba(177,18,42,.6); }
       .history-draw { background:rgba(130,118,175,.08); border-color:rgba(130,118,175,.45); }
+      .rulebook { margin-top: 12px; padding: 16px; border-radius: 14px; border:1px solid rgba(255,255,255,.08); background: rgba(6,0,4,.65); box-shadow:0 8px 24px rgba(0,0,0,.42); display:flex; flex-direction:column; gap:18px; }
+      .rulebook-header { display:flex; align-items:flex-start; justify-content:space-between; gap:12px; }
+      .info-grid { display:grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap:12px; align-items:start; }
+      .info-block { padding:12px; border-radius:12px; border:1px solid rgba(255,255,255,.08); background:rgba(255,255,255,.03); display:flex; flex-direction:column; gap:10px; box-shadow:0 8px 20px rgba(0,0,0,.3); }
+      .info-title { font-weight:800; letter-spacing:0.35px; text-transform:uppercase; color:#f8f1df; font-size:13px; }
+      .info-text { margin:0; line-height:1.45; color:#e9dbd1; }
+      .info-list { margin:0; padding-left:18px; display:flex; flex-direction:column; gap:8px; color:#e7d7cc; line-height:1.45; }
+      .info-list li { padding-left:4px; }
+      .card-chip { display:flex; align-items:center; gap:10px; border-radius:10px; border:1px solid rgba(255,255,255,.12); padding:8px; background:rgba(0,0,0,.28); min-width:140px; box-shadow:0 8px 18px rgba(0,0,0,.28); }
+      .card-chip-img { width:56px; height:76px; border-radius:10px; background-size:cover; background-position:center; box-shadow:0 6px 12px rgba(0,0,0,.4); }
+      .card-chip-body { display:flex; flex-direction:column; gap:4px; }
+      .card-chip-label { font-weight:800; letter-spacing:0.35px; text-transform:uppercase; color:#f8f1df; font-size:12px; }
+      .card-chip-count { font-size:12px; opacity:.85; color:#e7d7cc; letter-spacing:0.2px; }
+      .hand-visual { display:flex; flex-direction:column; gap:8px; background:rgba(255,255,255,.02); border-radius:10px; padding:10px; border:1px dashed rgba(255,255,255,.1); }
+      .hand-visual-header { display:flex; flex-direction:column; gap:4px; }
+      .hand-visual-cards { display:flex; flex-wrap:wrap; gap:10px; }
+      .matchup-grid { display:grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap:10px; }
+      .matchup-card { padding:10px; border-radius:12px; border:1px solid rgba(255,255,255,.08); background:rgba(255,255,255,.04); display:flex; flex-direction:column; gap:8px; box-shadow:0 8px 18px rgba(0,0,0,.26); }
+      .matchup-header { font-weight:800; letter-spacing:0.3px; color:#f7edde; }
+      .matchup-body { display:flex; align-items:center; gap:8px; }
+      .matchup-arrow { text-transform:uppercase; font-weight:800; letter-spacing:0.4px; color:#f0b862; font-size:12px; }
+      .matchup-note { font-size:12px; color:#dfcec5; line-height:1.45; }
     </style>
   </head>
   <body>

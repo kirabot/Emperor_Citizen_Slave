@@ -70,7 +70,7 @@
       .hand-visual { display:flex; flex-direction:column; gap:8px; background:rgba(255,255,255,.02); border-radius:10px; padding:10px; border:1px dashed rgba(255,255,255,.1); height:100%; }
       .hand-visual-header { display:flex; flex-direction:column; gap:4px; }
       .hand-visual-cards { display:flex; flex-wrap:wrap; gap:10px; justify-content:flex-start; }
-      .matchup-grid { display:grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap:10px; }
+      .matchup-grid { display:flex; flex-direction:column; gap:12px; }
       .matchup-card { padding:10px; border-radius:12px; border:1px solid rgba(255,255,255,.08); background:rgba(255,255,255,.04); display:flex; flex-direction:column; gap:10px; box-shadow:0 8px 18px rgba(0,0,0,.26); height:100%; }
       .matchup-header { font-weight:800; letter-spacing:0.3px; color:#f7edde; }
       .matchup-body { display:grid; grid-template-columns: 1fr auto 1fr; align-items:center; justify-items:center; gap:12px; }
@@ -101,9 +101,6 @@
         .join-panel .row { flex-direction:column; align-items:stretch; }
         .join-panel button { width:100%; }
         .hand { justify-content:center; }
-        .matchup-grid { grid-template-columns: 1fr; }
-        .matchup-body { grid-template-columns: 1fr; }
-        .matchup-arrow { order:3; }
         .card-chip { min-width:0; width:100%; }
         .card-chip-img { width:72px; height:102px; }
         .info-grid { grid-template-columns: 1fr; }

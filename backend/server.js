@@ -56,6 +56,14 @@ function push(room){
   for (const p of room.players) io.to(p.id).emit("state", tailoredState(room, p.id));
   io.to(room.code).emit("room:update", roomSnapshot(room));
 }
+function sendInitialState(room, socket, spectator){
+  if (!room.state) return;
+  if (spectator) {
+    socket.emit("state", roomSnapshot(room));
+    return;
+  }
+  socket.emit("state", tailoredState(room, socket.id));
+}
 
 const rooms = new Map();
 function randomCode(){ return Math.random().toString(36).slice(2, 6).toUpperCase(); }
@@ -118,6 +126,7 @@ io.on("connection", (socket) => {
     socket.join(room.code);
     cb?.({ ok: true, spectator });
     io.to(room.code).emit("room:update", roomSnapshot(room));
+    sendInitialState(room, socket, spectator);
   });
 
   socket.on("game:start", ({ room: code }, cb) => {

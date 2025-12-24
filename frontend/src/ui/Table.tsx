@@ -198,6 +198,11 @@ export default function Table({ room, snap, youName, spectator }:{ room:string; 
 
   const spectatorCount = spectatorList.length;
 
+  const displayYou = isSpectator ? leftSeat : you;
+  const displayOpp = isSpectator ? rightSeat : opp;
+  const displayYouName = displayYou?.name || (isSpectator ? "Awaiting Player" : youName);
+  const displayOppName = displayOpp?.name || "Awaiting Opponent";
+
   return <div>
     {prematureOver && (
       <div className="modal-backdrop" role="alertdialog" aria-labelledby="premature-title" aria-describedby="premature-body">
@@ -214,8 +219,8 @@ export default function Table({ room, snap, youName, spectator }:{ room:string; 
     )}
     <div className="row" style={{justifyContent:"space-between"}}>
       <div className="row">
-        <div className="pill">{you?.name || youName} • {roleLabel(you)}</div>
-        <div className="pill">{opp?.name || "Awaiting Opponent"} • {roleLabel(opp)}</div>
+        <div className="pill">{displayYouName} • {roleLabel(displayYou)}</div>
+        <div className="pill">{displayOppName} • {roleLabel(displayOpp)}</div>
         {spectatorCount > 0 && <div className="pill accent">{spectatorCount} Spectator{spectatorCount === 1 ? "" : "s"}</div>}
         {isSpectator && <div className="pill accent">Spectator</div>}
       </div>

@@ -1,12 +1,14 @@
 import React from "react";
-import emperorImg from "../assets/card-emperor.jpg";
-import slaveImg from "../assets/card-slave.jpg";
-import citizenImg from "../assets/card-citizen.jpg";
+import emperorImg from "../assets/card-emperor.png";
+import slaveImg from "../assets/card-slave.png";
+import citizenEmperorImg from "../assets/card-citizen-emperor.png";
+import citizenSlaveImg from "../assets/card-citizen-slave.png";
 
 const CARD_ART: Record<string, string> = {
   EMPEROR: emperorImg,
   SLAVE: slaveImg,
-  CITIZEN: citizenImg,
+  CITIZEN_EMPEROR: citizenEmperorImg,
+  CITIZEN_SLAVE: citizenSlaveImg,
 };
 
 type PreviewCard = {
@@ -68,7 +70,7 @@ export default function Rulebook(){
             flavor="One Haughty Emperor obeyed by four Citizens."
             cards={[
               { label: "Emperor", art: CARD_ART.EMPEROR, count: 1 },
-              { label: "Citizen", art: CARD_ART.CITIZEN, count: 4 },
+              { label: "Citizen", art: CARD_ART.CITIZEN_EMPEROR, count: 4 },
             ]}
           />
           <HandExample
@@ -76,7 +78,7 @@ export default function Rulebook(){
             flavor="One Desperate Slave emboldened by four Citizens."
             cards={[
               { label: "Slave", art: CARD_ART.SLAVE, count: 1 },
-              { label: "Citizen", art: CARD_ART.CITIZEN, count: 4 },
+              { label: "Citizen", art: CARD_ART.CITIZEN_SLAVE, count: 4 },
             ]}
           />
         </div>
@@ -91,7 +93,7 @@ export default function Rulebook(){
                 <div className="matchup-body">
                   <CardPreview label="Emperor" art={CARD_ART.EMPEROR} />
                   <span className="matchup-arrow">dominates</span>
-                  <CardPreview label="Citizen" art={CARD_ART.CITIZEN} />
+                  <CardPreview label="Citizen" art={CARD_ART.CITIZEN_SLAVE} />
                 </div>
                 <div className="matchup-note">Emperor crushes any Citizen.</div>
               </div>
@@ -109,7 +111,7 @@ export default function Rulebook(){
               <div className="matchup-card">
                 <div className="matchup-header">Citizen vs Slave</div>
                 <div className="matchup-body">
-                  <CardPreview label="Citizen" art={CARD_ART.CITIZEN} />
+                  <CardPreview label="Citizen" art={CARD_ART.CITIZEN_EMPEROR} />
                   <span className="matchup-arrow">ostracizes</span>
                   <CardPreview label="Slave" art={CARD_ART.SLAVE} />
                 </div>
@@ -119,9 +121,9 @@ export default function Rulebook(){
               <div className="matchup-card">
                 <div className="matchup-header">Citizen vs Citizen</div>
                 <div className="matchup-body">
-                  <CardPreview label="Citizen" art={CARD_ART.CITIZEN} />
+                  <CardPreview label="Citizen" art={CARD_ART.CITIZEN_EMPEROR} />
                   <span className="matchup-arrow">interlocutes</span>
-                  <CardPreview label="Citizen" art={CARD_ART.CITIZEN} />
+                  <CardPreview label="Citizen" art={CARD_ART.CITIZEN_SLAVE} />
                 </div>
                 <div className="matchup-note">Citizen mirror results in a draw.</div>
               </div>

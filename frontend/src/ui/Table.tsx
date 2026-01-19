@@ -3,22 +3,26 @@ import React, { useEffect, useMemo, useState } from "react";
 import { socket } from "../api/socket";
 import Card from "./Card";
 import Rulebook from "./Rulebook";
-import emperorImg from "../assets/card-emperor.jpg";
-import slaveImg   from "../assets/card-slave.jpg";
-import citizenImg from "../assets/card-citizen.jpg";
+import emperorImg from "../assets/card-emperor.png";
+import slaveImg   from "../assets/card-slave.png";
+import citizenEmperorImg from "../assets/card-citizen-emperor.png";
+import citizenSlaveImg from "../assets/card-citizen-slave.png";
 
 type Player = { id: string; name: string; role?: "EMPEROR_SIDE" | "SLAVE_SIDE" };
 
-const IMG: Record<string, string> = { EMPEROR: emperorImg, SLAVE: slaveImg, CITIZEN: citizenImg };
+const IMG: Record<string, string> = { EMPEROR: emperorImg, SLAVE: slaveImg };
 
-type HistoryCardProps = { card: "EMPEROR" | "SLAVE" | "CITIZEN"; result: "win" | "loss" | "draw"; label?: string };
+type HistoryCardProps = { card: "EMPEROR" | "SLAVE" | "CITIZEN"; result: "win" | "loss" | "draw"; label?: string; side?: "EMPEROR_SIDE" | "SLAVE_SIDE" };
 
-function HistoryCard({ card, result, label }: HistoryCardProps){
+function HistoryCard({ card, result, label, side }: HistoryCardProps){
   const displayLabel = label || `${card.charAt(0)}${card.slice(1).toLowerCase()}`;
   const outcomeLabel = `${result.charAt(0).toUpperCase()}${result.slice(1)}`;
+  const art = card === "CITIZEN"
+    ? (side === "SLAVE_SIDE" ? citizenSlaveImg : citizenEmperorImg)
+    : IMG[card];
   return (
     <div className={`history-card ${result}`}>
-      <div className="history-card-img" aria-label={card.toLowerCase()} role="img" style={{ backgroundImage: `url(${IMG[card]})` }} />
+      <div className="history-card-img" aria-label={card.toLowerCase()} role="img" style={{ backgroundImage: `url(${art})` }} />
       <div className="history-card-label">
         <span className="history-card-name">{displayLabel}</span>
         <span className="history-card-outcome">{outcomeLabel}</span>
@@ -134,6 +138,11 @@ export default function Table({ room, snap, youName, spectator }:{ room:string; 
     for (const p of players) map[p.id] = p.name;
     return map;
   }, [players]);
+  const roleById = useMemo(() => {
+    const map: Record<string, "EMPEROR_SIDE" | "SLAVE_SIDE" | undefined> = {};
+    for (const p of players) map[p.id] = p.role;
+    return map;
+  }, [players]);
 
   const groupedHistory = useMemo(() => {
     const groups: { key:string; set:number; round:number; entries:any[] }[] = [];
@@ -179,9 +188,9 @@ export default function Table({ room, snap, youName, spectator }:{ room:string; 
                   return (
                     <div key={idx} className="history-hand">
                       <div className="history-hand-cards">
-                        <HistoryCard card={h.a.card} result={aResult} label={nameById[h.a.id] || "Player"} />
+                        <HistoryCard card={h.a.card} result={aResult} label={nameById[h.a.id] || "Player"} side={roleById[h.a.id]} />
                         <div className="history-versus">VS</div>
-                        <HistoryCard card={h.b.card} result={bResult} label={nameById[h.b.id] || "Player"} />
+                        <HistoryCard card={h.b.card} result={bResult} label={nameById[h.b.id] || "Player"} side={roleById[h.b.id]} />
                       </div>
                       <div className="history-flavor">{h.flavor || "…"}</div>
                       <div className="history-result">{resultLine}</div>
@@ -260,7 +269,7 @@ export default function Table({ room, snap, youName, spectator }:{ room:string; 
             {lockHint && <div className={`muted lock-hint ${opponentPicked || opponentLocked ? "lock-alert" : ""}`} style={{ marginTop: 6 }}>{lockHint}</div>}
             <div className="hand" style={{gap:16}}>
               {hand.map((c, i)=>(
-                <Card key={i} kind={c as any} selected={selectedIndex === i} disabled={Boolean(selectedPick)} onClick={()=>play(c, i)} />
+                <Card key={i} kind={c as any} side={you?.role} selected={selectedIndex === i} disabled={Boolean(selectedPick)} onClick={()=>play(c, i)} />
               ))}
             </div>
 

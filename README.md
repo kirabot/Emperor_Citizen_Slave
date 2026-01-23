@@ -59,7 +59,7 @@ npm --prefix desktop install
 npm --prefix desktop run dist:win
 ```
 
-Set `BACKEND_URL` to point at your hosted server when running the desktop app:
+Set `BACKEND_URL` to point at your hosted server when running the desktop app (the dev script builds the renderer before launching Electron):
 
 ```bash
 BACKEND_URL="http://your-host:8080" npm --prefix desktop run dev

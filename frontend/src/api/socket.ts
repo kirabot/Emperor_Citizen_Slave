@@ -5,6 +5,11 @@ const fallbackBackendUrl = window.location.port
   ? `${window.location.protocol}//${window.location.hostname}:8080`
   : window.location.origin;
 
-export const socket: Socket = io(import.meta.env.VITE_BACKEND_URL || fallbackBackendUrl, {
-  transports: ["websocket"]
-});
+const desktopBackendUrl = window.ECARD_DESKTOP?.backendUrl?.trim();
+
+export const socket: Socket = io(
+  desktopBackendUrl || import.meta.env.VITE_BACKEND_URL || fallbackBackendUrl,
+  {
+    transports: ["websocket"]
+  }
+);

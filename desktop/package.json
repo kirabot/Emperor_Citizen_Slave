@@ -1,0 +1,33 @@
+{
+  "name": "ecard-desktop",
+  "version": "1.1.0",
+  "private": true,
+  "main": "main.cjs",
+  "scripts": {
+    "dev": "electron .",
+    "build:renderer": "npm --prefix ../frontend run build && node ./scripts/copy-renderer.mjs",
+    "dist": "npm run build:renderer && electron-builder --publish=never",
+    "dist:win": "npm run build:renderer && electron-builder --win --x64 --publish=never"
+  },
+  "devDependencies": {
+    "electron": "^31.2.0",
+    "electron-builder": "^24.13.3"
+  },
+  "build": {
+    "appId": "com.emperorcitizenslave.desktop",
+    "productName": "EmperorCitizenSlave",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "main.cjs",
+      "preload.cjs",
+      "renderer-dist/**"
+    ],
+    "win": {
+      "target": [
+        "nsis"
+      ]
+    }
+  }
+}

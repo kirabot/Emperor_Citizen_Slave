@@ -36,4 +36,36 @@ Tiny 2‑player bluff game. One side plays Emperor + 4 Citizens, the other plays
 - Configure environment variables for network mode (LAN / ZeroTier)  
 - Start backend (node server.js) and serve frontend (Vite) or use provided build
 
+## Server + client packaging
+This repo now supports a dedicated server machine and multiple standalone clients:
+
+### Backend server (host on its own machine)
+1. Configure environment variables (see `backend/server.js` for supported values).  
+2. Start the server with `npm --prefix backend run start` or via Docker.  
+3. Point clients at the server URL (e.g. `http://your-host:8080`).
+
+### Web client (unchanged)
+Build the web UI with `npm --prefix frontend run build` and host the `frontend/dist` output anywhere.
+
+### Desktop client (Windows `.exe`)
+An Electron wrapper packages the web UI into a downloadable Windows app while still using the same backend:
+
+```bash
+# from repo root
+npm --prefix frontend install
+npm --prefix desktop install
+
+# build a Windows installer
+npm --prefix desktop run dist:win
+```
+
+Set `BACKEND_URL` to point at your hosted server when running the desktop app:
+
+```bash
+BACKEND_URL="http://your-host:8080" npm --prefix desktop run dev
+```
+
+## CI: build desktop app on push
+GitHub Actions is configured to build the Windows installer on pushes to `main`. Artifacts are stored in the workflow run output.
+
 License: see repository for details.

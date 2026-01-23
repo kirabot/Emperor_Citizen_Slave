@@ -1,0 +1,33 @@
+name: Build Desktop App
+
+on:
+  push:
+    branches: ["main"]
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install frontend dependencies
+        run: npm --prefix frontend ci
+
+      - name: Install desktop dependencies
+        run: npm --prefix desktop ci
+
+      - name: Build Windows installer
+        run: npm --prefix desktop run dist:win
+
+      - name: Upload installer artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: EmperorCitizenSlave-Windows
+          path: desktop/dist/**

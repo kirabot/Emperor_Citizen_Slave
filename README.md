@@ -42,7 +42,7 @@ This repo now supports a dedicated server machine and multiple standalone client
 ### Backend server (host on its own machine)
 1. Configure environment variables (see `backend/server.js` for supported values).  
 2. Start the server with `npm --prefix backend run start` or via Docker.  
-3. Point clients at the server URL (e.g. `http://your-host:8080`).
+3. Point clients at the server URL (e.g. `http://euclidean.ddns.net:2456`).
 
 ### Web client (unchanged)
 Build the web UI with `npm --prefix frontend run build` and host the `frontend/dist` output anywhere.
@@ -62,7 +62,7 @@ npm --prefix desktop run dist:win
 Set `BACKEND_URL` to point at your hosted server when running the desktop app (the dev script builds the renderer before launching Electron):
 
 ```bash
-BACKEND_URL="http://your-host:8080" npm --prefix desktop run dev
+BACKEND_URL="http://euclidean.ddns.net:2456" npm --prefix desktop run dev
 ```
 
 ## CI: build desktop app on push

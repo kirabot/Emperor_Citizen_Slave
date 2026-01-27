@@ -350,5 +350,5 @@ io.on("connection", (socket) => {
   });
 });
 
-const PORT = process.env.PORT || 8080;
+const PORT = process.env.PORT || 2456;
 server.listen(PORT, () => console.log("ecard backend listening on", PORT));

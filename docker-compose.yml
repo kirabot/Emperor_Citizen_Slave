@@ -3,15 +3,15 @@ services:
     build: ./backend
     environment:
       NODE_ENV: production
-      PORT: 8080
-      FRONTEND_ORIGIN: "http://178.254.142.4:5173"  # exact origin
+      PORT: 2456
+      FRONTEND_ORIGIN: "http://euclidean.ddns.net:25565"  # exact origin
     ports:
-      - "8080:8080"
+      - "2456:2456"
 
   web:
     build:
       context: ./frontend
       args:
-        VITE_BACKEND_URL: "http://178.254.142.4:8080"
+        VITE_BACKEND_URL: "http://euclidean.ddns.net:2456"
     ports:
-      - "5173:80"
+      - "25565:80"

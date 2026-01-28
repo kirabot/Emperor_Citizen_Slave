@@ -22,6 +22,9 @@ export default function Lobby({ onReady }:{ onReady:(room:string, name:string, s
         <button className="cta-button" disabled={!name} onClick={()=>{
           socket.emit("guest:create", { name }, ({ room }) => onReady(room, name, false));
         }}>Create Room</button>
+        <button disabled={!name} onClick={()=>{
+          socket.emit("guest:create", { name, spectator: true }, ({ room, spectator }) => onReady(room, name, spectator));
+        }}>Create Room (Spectator)</button>
         <div className="or-divider">or</div>
         <div className="join-panel">
           <div className="input-label">Enter a Room Code</div>
@@ -32,6 +35,11 @@ export default function Lobby({ onReady }:{ onReady:(room:string, name:string, s
                 if (res?.error) alert(res.error); else onReady(room, name, res?.spectator);
               })
             }}>Join</button>
+            <button disabled={!name || room.length < 4} onClick={()=>{
+              socket.emit("guest:join", { room, name, spectator: true }, (res:any)=>{
+                if (res?.error) alert(res.error); else onReady(room, name, res?.spectator);
+              })
+            }}>Spectate</button>
           </div>
         </div>
       </div>

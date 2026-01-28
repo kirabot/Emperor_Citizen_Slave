@@ -1,5 +1,5 @@
 
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import Lobby from "./Lobby";
 import Table from "./Table";
 import { socket } from "../api/socket";
@@ -12,6 +12,7 @@ export default function App(){
   const [name, setName] = useState<string>("");
   const [snap, setSnap] = useState<State|null>(null);
   const [spectator, setSpectator] = useState<boolean>(false);
+  const roomRef = useRef("");
   const resetToStart = () => {
     setRoom("");
     setName("");
@@ -46,8 +47,22 @@ export default function App(){
   };
 
   useEffect(() => {
-    const onState = (s:any)=> setSnap(s);
-    const onUpdate = (r:any)=> setSnap(prev => prev ? { ...prev, ...r } : r);
+    roomRef.current = room;
+  }, [room]);
+
+  useEffect(() => {
+    const onState = (s:any)=> {
+      const currentRoom = roomRef.current;
+      if (!currentRoom) return;
+      if (s?.code && s.code !== currentRoom) return;
+      setSnap(s);
+    };
+    const onUpdate = (r:any)=> {
+      const currentRoom = roomRef.current;
+      if (!currentRoom) return;
+      if (r?.code && r.code !== currentRoom) return;
+      setSnap(prev => prev ? { ...prev, ...r } : r);
+    };
     socket.on("state", onState);
     socket.on("room:update", onUpdate);
     return () => { socket.off("state", onState); socket.off("room:update", onUpdate); };

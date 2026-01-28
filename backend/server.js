@@ -66,7 +66,28 @@ function sendInitialState(room, socket, spectator){
 }
 
 const rooms = new Map();
-function randomCode(){ return Math.random().toString(36).slice(2, 6).toUpperCase(); }
+function randomCode(){
+  let code = Math.random().toString(36).slice(2, 6).toUpperCase();
+  while (rooms.has(code)) code = Math.random().toString(36).slice(2, 6).toUpperCase();
+  return code;
+}
+function removeSocketFromRooms(socket){
+  for (const [code, room] of rooms) {
+    const beforePlayers = room.players.length;
+    const beforeSpectators = room.spectators.length;
+    room.players = room.players.filter(p => p.id !== socket.id);
+    room.spectators = room.spectators.filter(s => s.id !== socket.id);
+    if (room.players.length === 0 && room.spectators.length === 0) {
+      rooms.delete(code);
+      socket.leave(code);
+      continue;
+    }
+    if (room.players.length !== beforePlayers || room.spectators.length !== beforeSpectators) {
+      socket.leave(code);
+      io.to(code).emit("room:update", roomSnapshot(room));
+    }
+  }
+}
 
 function roomSnapshot(room){
   if (!room.state) return { code: room.code, players: room.players.map(p=>({id:p.id,name:p.name,role:p.role})), spectators: room.spectators.map(s=>({id:s.id,name:s.name})), state:null };
@@ -103,30 +124,34 @@ function tailoredState(room, forId){
 }
 
 io.on("connection", (socket) => {
-  socket.on("guest:create", ({ name }, cb) => {
+  socket.on("guest:create", ({ name, spectator }, cb) => {
+    removeSocketFromRooms(socket);
     const code = randomCode();
-    const room = { code, players: [{ id: socket.id, name: String(name||"guest") }], spectators: [], state: null };
+    const entrant = { id: socket.id, name: String(name||"guest") };
+    const isSpectator = Boolean(spectator);
+    const room = { code, players: isSpectator ? [] : [entrant], spectators: isSpectator ? [entrant] : [], state: null };
     rooms.set(code, room);
     socket.join(code);
-    cb?.({ room: code });
+    cb?.({ room: code, spectator: isSpectator });
     io.to(code).emit("room:update", roomSnapshot(room));
   });
 
-  socket.on("guest:join", ({ room: code, name }, cb) => {
+  socket.on("guest:join", ({ room: code, name, spectator }, cb) => {
     const room = rooms.get(String(code || "").toUpperCase());
     if (!room) return cb?.({ error: "room not found" });
+    removeSocketFromRooms(socket);
     const entrant = { id: socket.id, name: String(name||"guest") };
-    let spectator = false;
-    if (room.players.length >= 2) {
+    let isSpectator = Boolean(spectator);
+    if (room.players.length >= 2 || isSpectator) {
       room.spectators.push(entrant);
-      spectator = true;
+      isSpectator = true;
     } else {
       room.players.push(entrant);
     }
     socket.join(room.code);
-    cb?.({ ok: true, spectator });
+    cb?.({ ok: true, spectator: isSpectator });
     io.to(room.code).emit("room:update", roomSnapshot(room));
-    sendInitialState(room, socket, spectator);
+    sendInitialState(room, socket, isSpectator);
   });
 
   socket.on("game:start", ({ room: code }, cb) => {
